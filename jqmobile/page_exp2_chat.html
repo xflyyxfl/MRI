@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>NMR虚拟教学实验</title>
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css">
+<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+<script src="chat/Aristochart.js"></script>
+<script>
+	
+	
+	function msg(a_)
+	{
+		confirm(a_);
+		
+		
+		
+	}
+	
+	function get_session_key(a_)
+	{
+		return "OK";
+		//return "NO";
+	}
+				function m(a_){
+				
+				$.ui.showMask(a_);
+				setTimeout($.ui.hideMask,2000);
+				
+			}
+			
+	function set_btn_status(a_)
+	{
+		if(a_=="stop")
+		{
+			$("#btn_aqz span").last().attr("class","ui-icon ui-icon-minus ui-icon-shadow");
+			$("#btn_aqz span.ui-btn-text").text("停止采集");
+			$("#btn_aqz").attr("status","start");
+			$("#show").attr("src","gif/1234567.gif");
+		}
+		else
+		{
+			$("#btn_aqz span").last().attr("class","ui-icon ui-icon-refresh ui-icon-shadow");
+			$("#btn_aqz span.ui-btn-text").text("开始采集");
+			$("#btn_aqz").attr("status","stop");
+			$("#show").attr("src","pic/0.jpg");
+			
+		}
+			
+		
+	}
+	function show_data()
+	{
+		
+		if($("#btn_aqz").attr("status")=="stop"){set_btn_status("stop");}else{set_btn_status("start");}
+		
+		
+		//alert("start to get data");
+		
+		
+	}
+	
+	function par_click()
+	{
+		//alert("set par");
+		$('#par_zone h1').click();
+		
+	}
+
+
+</script>
+ <script type="text/javascript">  
+ function get_id_val(s)
+ {
+	 var a_=$(s).val();
+	 var range_=$(s).attr("range");
+	 var unit_=$(s).attr("unit");
+	 msg(s + ":" +a_ + " range:" + range_+ unit_);
+	// m("out of range");
+	var min_=Number(range_.split("~")[0]);
+	var max_=Number(range_.split("~")[1]);
+	if(Number(a_)<min_||Number(a_)>max_)
+	{
+		$(s).val("out of range:" + range_ + unit_);
+		data_good=false;
+	}
+	 return(a_);
+	 
+	
+ }
+  
+ function get_par()
+ {
+	 data_good=true;
+	 msg("get_par");
+	 B0=get_id_val("#par_B0");
+	 B0_switch= $("label[for='par_B0_switch']").attr("data-icon")=="checkbox-on";msg("B0_switch:" +B0_switch);
+	 
+	 TD=get_id_val("#par_TD");
+	 SF=get_id_val("#par_SF");
+	 O1=get_id_val("#par_O1");
+	 
+	 SW=get_id_val("#par_SW");
+	 B1=get_id_val("#par_RF");
+	 RF_switch= $("label[for='par_RF_switch']").attr("data-icon")=="checkbox-on";msg("RF_switch:" +RF_switch);
+	
+	 TR=get_id_val("#par_TR");
+	 SAM_switch= $("label[for='par_SAM_switch']").attr("data-icon")=="checkbox-on";msg("SAM_switch:" +SAM_switch);
+	
+	 
+	 
+ }
+ 
+ 
+ 
+ function show_data1(){
+	 msg("show_data1 fun");
+	 get_par();
+	if(!data_good){msg("data not good and return");return ;}
+	
+	sig();
+//	c_data3(30);
+//	dat=new Object();
+//	dat={x:10,y:bigdata,y1:bigdata1,y2:bigdata2};
+//	
+//	set_d(dat);
+	 
+ }
+ 
+ function sig_show()
+ {
+	msg("signal simulate start!");
+	if(!B0_switch)B0=0;
+	
+	nx=61;ny=61;rx=30;ry=30;
+	p=zeros(ny,nx);
+	T1=zeros(ny,nx);
+	T2=zeros(ny,nx);
+	//create matrix of P,t1,t2
+	for(var x=1;x<nx+1;x++)
+	{
+		for(var y=1;y<ny+1;y++)
+		{
+			
+		  if(Math.pow((x-nx/2),2)/Math.pow(rx,2)+Math.pow((y-ny/2),2)/Math.pow(ry,2)<=1)
+		  	{
+				if(SAM_switch)
+					{
+						p[y-1][x-1]=1;
+						T1[y-1][x-1]=284*0.001;
+						T2[y-1][x-1]=50*0.001;
+					}
+					else
+					{
+						p[y-1][x-1]=0;
+						T1[y-1][x-1]=0;
+						T2[y-1][x-1]=0;
+					}
+					
+			
+			}
+		}
+		
+		
+		
+	}
+	
+	tao=3*0.000001;
+	BW=1.21/tao;
+	r=42580000;
+	f=SF*1e6+O1*1e3;
+	//B
+	
+	if(RF_switch)
+	{
+		B1=B1*1e-4;
+		if((f>(r*B0+BW))||(f<(r*B0-BW)))
+		{
+			B1=0;	
+		}
+		else
+		{
+			// B1=B1.*sinc((f-r.*B0).*tao./1.21);
+			var a_=Math.PI*(f-r*B0)*tao/1.21;
+			B1=B1*Math.sin(a_)/(a_);
+			msg("B1:" + B1);
+		}
+		
+		
+	}
+	else
+	{
+		B1=0;
+	}
+	
+	
+	 sinda=2*Math.PI*r*B1*tao;
+	  noisy=1;
+	 T=TD/SW;
+	 t=[];
+	 //snr=[];
+	// sig=[];sig1=[];
+	 for(var i=0;i<=TD;i++)
+	 {
+		 
+		t.push(i/SW);
+		//snr[i]=[];
+//		snr[i][0]=Math.cos(1*(1+10*noisy*Math.random())*t[i]); //?
+//		snr[i][1]=Math.sin(10*(1+10*noisy*Math.random())*t[i]);
+//		
+//		sig[i]=[];
+//		sig[i][0]=Math.sqrt(1/(Math.pow(2,snr[i][0]/(0.1*(1+10*noisy*Math.random())))));
+//		sig[i][1]=Math.sqrt(1/(Math.pow(2,snr[i][1]/(0.1*(1+10*noisy*Math.random())))));
+//		
+//		sig1[i]=[];
+//		sig1[i][0]=
+		 
+	 }
+	
+	s=[0];s12=[0];
+	if (!(B0_switch&&RF_switch&&SAM_switch))
+	{
+		s=Math.random(TD);
+	}
+	else
+	{
+		if((f>(r*B0+BW))||(f<(r*B0-BW))) //Math.abs(f-r*B0)>BW
+		{
+			s=Math.random(TD);
+			
+		}
+		else
+		{
+			s=zeros(TD,2);s1=zeros(TD,2);
+			s12=zeros(TD,1);s11=zeros(TD,1);
+			for(var n1=1;n1<=61;n1++)
+			{
+				
+				for(var n11=1;n11<=61;n11++)
+				{
+					// s1=(3+(1-3)*rand()).*(sin(sinda)).*(p(n1,n11).*(1-exp(-TR./T1(n1,n11))).*(cos( 0.000628.*(r.*B0-f).*t)+i.*sin( 0.000628.*(r.*B0-f).*t)).*exp(-t./(1./(1./(50.*(T2(n1,n11)))+(r.*0.001.*0.0001)./2))));
+					//s=s+s1;
+					
+					for(var i=0;i<=TD;i++)
+					{
+						var a_=(3-2*Math.random())*Math.sin(sinda)*p[n1][n11]*(1-Math.exp(-TR/T1[n1][n11]))*Math.exp(-t[i]*0.02/T2[n1][n11])*Math.exp(-t[i]*r*0.001*0.0001/2);
+						s1[i][0]=a_*Math.cos(0.000628*(r*B0-f)*t[i]); 
+						s1[i][1]=a_*Math.sin(0.000628*(r*B0-f)*t[i]);
+						s[i][0]=s[i][0]+s1[i][0];
+						s[i][1]=s[i][1]+s1[i][1];
+						
+						s11[i]=Math.sin(sinda)*p[n1][n11]*1.07*(1-Math.exp(-TR/T1[n1][n11]))*Math.exp(-t[i]/(50*T2[n1][n11]))*(3+(0.75-3)*Math.random());
+						s12[i]=s12[i]+s11[i];
+					}
+					
+					
+					
+					
+				}
+			}
+		}
+		
+	}
+	
+	
+	
+	 
+	 
+ }
+ 
+ 
+ function zeros(row,col)
+ {
+	var a_=[];
+	for(var i=0;i<col;i++)
+	{
+		//a_.push(0);
+		a_[i]=[];
+		for(var j=0;j<row;j++)
+			{
+				a_[i][j]=0;
+			}
+	}
+	return a_;
+	 
+ }
+ 
+ function set_d(d)
+{
+
+	window.graph.data=d;
+	window.graph.render();
+	
+}
+ function c_data3(n){
+	bigdata = [n];
+	bigdata1 = [n];
+	bigdata2=[n*Math.sqrt(2)];
+	for(var i = 1; i < 1024; i++) {
+		var val = bigdata[i - 1] + (Math.random() * ((Math.random() > 0.5) ? -2 : 2));
+		val = (val > 50) ? 50 : val;
+		val = (val < 0) ? 0 : val;
+		bigdata.push(val);
+		bigdata1.push(50-val);
+		bigdata2.push(Math.sqrt(Math.pow(val,2)+Math.pow(50-val,2)));
+		
+
+	}
+}
+function c_data(){
+	 bigdata = [25];
+	for(var i = 1; i < 1024; i++) {
+		var val = bigdata[i - 1] + (Math.random() * ((Math.random() > 0.5) ? -1 : 1));
+		val = (val > 50) ? 50 : val;
+		val = (val < 0) ? 0 : val;
+		bigdata.push(val);
+	}
+}
+function play(){
+	window.graph = new Aristochart(document.getElementById('chat'), {
+		axis: {
+			y: {
+				//min: 0,
+				//max: 50
+			}
+		},
+
+		style: {
+			default: {
+				point: {
+					visible: false,
+				},
+
+				line: {
+					fill: false,
+					width: 1
+				}
+			}
+		},
+
+		data: {
+			x: 20,
+			y: bigdata
+		}
+	});
+}
+
+function msg(s){console.log(s);}
+</script>
+</head>
+<body>
+<div data-role="page">
+
+<div data-role="header" data-position="fixed"> <a href="#" data-role="button" data-rel="back" data-transition="slide" data-direction="reverse" >后退</a>
+  <h1>核磁共振基础实验</h1>
+</div>
+
+
+<div data-role="content">
+  <div id="par_zone" data-role="collapsible" >
+    
+     <h1>参数设置</h1>
+     
+    <label for="par_B0" id="par">B0(T)：</label>
+    <input type="text" name="par_B0" id="par_B0" placeholder="主磁场强度" range="0.1~3" unit="T">
+    <label for="par_B0_switch">B0 ON</label>
+    <input id="par_B0_switch" type="checkbox" name="par_b0_switch" value="xfl" class="toggle" >
+    <label for="par_SF">SF(Mhz)：</label>
+    <input type="text" name="par_SF" id="par_SF" placeholder="主频率"  range="4~127" unit="MHz">
+    <label for="par_O1">O1(Khz)：</label>
+    <input type="text" name="par_O1" id="par_O1" placeholder="offset freq" range="0~1000" unit="KHz">
+    <label for="par_TD">TD：</label>
+    <input type="text" name="par_TD" id="par_TD" placeholder="采样点数" range="32~32768" unit="NUM">
+    <label for="par_SW">SW(Khz)：</label>
+    <input type="text" name="par_SW" id="par_SW" placeholder="采样频率" range="10~500" unit="KHz">
+    <label for="par_RF">B1(Gs)：</label>
+    <input type="text" name="par_RF" id="par_RF" placeholder="射频场强" range="1~40" unit="Gs">
+    <label for="par_RF_switch">RF ON</label>
+    <input id="par_RF_switch" type="checkbox" name="recordPwd"  class="toggle" >
+    <label for="par_TR">TR(ms)：</label>
+    <input type="text" name="par_TR" id="par_TR" placeholder="等待时间" range="10~30000" unit="ms">
+     <label for="par_SAM_switch">SAMPLE IN  water</label>
+    <input id="par_SAM_switch" type="checkbox" name="recordPwd"  class="toggle">
+  </div>
+  <div data-role="dialog" id="alert-dialog">
+
+    <!-- 页眉部分start -->
+    <div data-role="header">
+       <h1>提示信息</h1>
+    </div>
+    <!-- 页眉部分end -->
+    
+    <!-- content部分start -->
+    <div data-role="content">
+        <p>您现在查看的内容：基础篇之dialog</p>
+        <p>由@zhangyaochun制作完成</p>
+        <p>希望能够帮助到您</p>
+    </div>
+    <!-- content部分end -->
+
+</div>
+  <div data-role="collapsible" data-collapsed="false"><h1>数据采集</h1>
+	
+       <font size="-1" >提示:本次实验序列为fid序列</font>
+  <script>console.log("chat script running");c_data();play();</script>
+  <div id="chat"></div>
+     
+  <!-- <div id="show_zone" style="background-size:100%"> <img id="show" src="pic/0.jpg" /></div>-->
+   
+  </div>
+  
+ 
+  <div data-role="footer" data-position="fixed" id="exp_footer">
+    <div data-role="navbar">
+      <ul>
+        <li><a href="#par_zone" data-icon="gear" onClick="par_click()">实验参数  </a></li>
+       <li><a id="btn_aqz" href="#show_zone" data-icon="refresh" Onclick="show_data1()" status="stop">采集数据</a></li>
+      
+        
+        
+       <!--<li> <a id="btn_stop" href="#show_zone" data-icon="minus" Onclick="show_data()">停止采集</a></li>-->
+        <li><a href="#p" data-icon="arrow-r">作业</a>
+
+        </li>
+      </ul>
+    </div>
+    
+  </div>
+  
+</div>
+
+</div>
+</body>
+</html>

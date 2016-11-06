@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>NMR虚拟教学实验</title>
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css">
+<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+<script>
+	
+	
+	function msg(a_)
+	{
+		confirm(a_);
+		
+		
+		
+	}
+	
+	function get_session_key(a_)
+	{
+		return "OK";
+		//return "NO";
+	}
+				function m(a_){
+				
+				$.ui.showMask(a_);
+				setTimeout($.ui.hideMask,2000);
+				
+			}
+			
+	function set_btn_status(a_)
+	{
+		if(a_=="stop")
+		{
+			$("#btn_aqz span").last().attr("class","ui-icon ui-icon-minus ui-icon-shadow");
+			$("#btn_aqz span.ui-btn-text").text("停止采集");
+			$("#btn_aqz").attr("status","start");
+			$("#show").attr("src","gif/1234567.gif");
+		}
+		else
+		{
+			$("#btn_aqz span").last().attr("class","ui-icon ui-icon-refresh ui-icon-shadow");
+			$("#btn_aqz span.ui-btn-text").text("开始采集");
+			$("#btn_aqz").attr("status","stop");
+			$("#show").attr("src","pic/0.jpg");
+			
+		}
+			
+		
+	}
+	function show_data()
+	{
+		
+		if($("#btn_aqz").attr("status")=="stop"){set_btn_status("stop");}else{set_btn_status("start");}
+		
+		
+		//alert("start to get data");
+		
+		
+	}
+	
+	function par_click()
+	{
+		//alert("set par");
+		$('#par_zone h1').click();
+		
+	}
+
+
+</script>
+</head>
+<body>
+<div data-role="page">
+
+<div data-role="header" data-position="fixed"> <a href="#" data-role="button" data-rel="back" data-transition="slide" data-direction="reverse" >后退</a>
+  <h1>核磁共振基础实验</h1>
+</div>
+
+
+<div data-role="content">
+  <div id="par_zone" data-role="collapsible" >
+    
+     <h1>参数设置</h1>
+     
+    <label for="par_B0" id="par">B0(T)：</label>
+    <input type="text" name="par_B0" id="par_B0" placeholder="主磁场强度">
+    <label for="par_b0_switch">B0 ON</label>
+    <input id="par_b0_switch" type="checkbox" name="par_b0_switch" value="xfl" class="toggle" >
+    
+    <label for="par_SF">SF(Mhz)：</label>
+    <input type="text" name="par_sf" id="par_sf" placeholder="主频率">
+    <label for="par_O1">O1(Khz)：</label>
+    <input type="text" name="par_O1" id="par_O1" placeholder="offset freq">
+    <label for="par_TD">TD：</label>
+    <input type="text" name="par_TD" id="par_TD" placeholder="采样点数">
+    <label for="par_SW">SW(Khz)：</label>
+    <input type="text" name="par_SW" id="par_SW" placeholder="采样频率">
+    <label for="par_RF">B1(Gs)：</label>
+    <input type="text" name="par_RF" id="par_RF" placeholder="射频场强">
+    <label for="par_RF_switch">RF ON</label>
+    <input id="par_RF_switch" type="checkbox" name="recordPwd"  class="toggle">
+    <label for="par_TR">TR(ms)：</label>
+    <input type="text" name="par_TR" id="par_TR" placeholder="等待时间">
+    
+  </div>
+  
+  <div data-role="collapsible" data-collapsed="false"><h1>数据采集</h1>
+	
+       <font size="-1" >提示:本次实验序列为fid序列</font>
+   <div id="show_zone" style="background-size:100%"> <img id="show" src="pic/0.jpg" /></div>
+   
+  </div>
+  
+ 
+  <div data-role="footer" data-position="fixed" id="exp_footer">
+    <div data-role="navbar">
+      <ul>
+        <li><a href="#par_zone" data-icon="gear" onClick="par_click()">实验参数  </a></li>
+       <li><a id="btn_aqz" href="#show_zone" data-icon="refresh" Onclick="show_data()" status="stop">采集数据</a></li>
+      
+        
+        
+       <!--<li> <a id="btn_stop" href="#show_zone" data-icon="minus" Onclick="show_data()">停止采集</a></li>-->
+        <li><a href="#p" data-icon="arrow-r">作业</a>
+
+        </li>
+      </ul>
+    </div>
+    
+  </div>
+  
+</div>
+
+</div>
+</body>
+</html>

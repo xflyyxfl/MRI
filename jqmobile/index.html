@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<title>NMR虚拟教学实验</title>
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css">
+<script src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+<script src="chat/Aristochart.js"></script>
+<script>
+	function check_login()
+	{
+		if(get_session_key("user_name")=="OK"){return true;}else{return false;}
+		debug.log(get_session_key("user_name"));
+		
+	;	
+	}
+	
+	function msg(a_)
+	{
+		confirm(a_);
+		
+		
+		
+	}
+	
+	function get_session_key(a_)
+	{
+		return "OK";
+		//return "NO";
+	}
+				function m(a_){
+				
+				$.ui.showMask(a_);
+				setTimeout($.ui.hideMask,2000);
+				
+			}
+
+
+</script>
+ <script type="text/javascript">   
+ function show_data1(){
+	c_data3(30);
+	dat=new Object();
+	dat={x:10,y:bigdata,y1:bigdata1,y2:bigdata2};
+	
+	set_d(dat);
+	 
+ }
+ 
+ function set_d(d)
+{
+
+	window.graph.data=d;
+	window.graph.render();
+	
+}
+ function c_data3(n){
+	bigdata = [n];
+	bigdata1 = [n];
+	bigdata2=[n*Math.sqrt(2)];
+	for(var i = 1; i < 1024; i++) {
+		var val = bigdata[i - 1] + (Math.random() * ((Math.random() > 0.5) ? -2 : 2));
+		val = (val > 50) ? 50 : val;
+		val = (val < 0) ? 0 : val;
+		bigdata.push(val);
+		bigdata1.push(50-val);
+		bigdata2.push(Math.sqrt(Math.pow(val,2)+Math.pow(50-val,2)));
+		
+
+	}
+}
+function c_data(){
+	 bigdata = [25];
+	for(var i = 1; i < 1024; i++) {
+		var val = bigdata[i - 1] + (Math.random() * ((Math.random() > 0.5) ? -1 : 1));
+		val = (val > 50) ? 50 : val;
+		val = (val < 0) ? 0 : val;
+		bigdata.push(val);
+	}
+}
+function play(){
+	window.graph = new Aristochart(document.getElementById('chat'), {
+		axis: {
+			y: {
+				min: 0,
+				max: 50
+			}
+		},
+
+		style: {
+			default: {
+				point: {
+					visible: false,
+				},
+
+				line: {
+					fill: false,
+					width: 1
+				}
+			}
+		},
+
+		data: {
+			x: 10,
+			y: bigdata
+		}
+	});
+}
+</script>
+</head>
+<body>
+<div data-role="page" id="pageone" data-load="msg('xfl')" >
+  <div data-role="header" id="main_header">
+    <h1>MRI虚拟教学实验系统</h1>
+  </div>
+  <div data-role="content">
+    <form method="post" action="demoform.asp">
+      <div data-role="fieldcontain">
+        <label for="student_name">姓名：</label>
+        <input type="text" name="student_name" id="student_name" data-inline="true">
+        <label for="student_num">学号：</label>
+        <input type="text" name="student_num" id="student_num">
+        <label for="student_pwd">密码：</label>
+        <input type="password" name="student_pwd" id="student_pwd" placeholder="如果忘记了请联系..">
+        <a href="#page_login_ok"  data-role="button" onClick="return check_login()" data-transition="slide">登录</a> </div>
+      <div style="display:none"> <input hidden="true" type="submit"  value="登录"  data-inline="true" style="visibility:hidden" onClick="msg('xfl')"></div>
+    </form>
+  </div>
+  <div data-role="footer" data-position="fixed" id="main_footer">
+    <div data-role="navbar">
+      <ul>
+        <li><a href="#pageone" data-icon="home" onClick="m('login')" >登录</a></li>
+        <li><a href="#page_login_ok" data-icon="arrow-r"  onClick="return check_login()" data-transition="slide">实验教学</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div data-role="page" id="page_login_ok" data-header="main_header">
+<div data-role="header">
+<h1>教学实验选择</h1>
+</div>
+
+<div data-role="content">
+    <ol data-role="listview">
+    
+      <li><a href="page_exp.html">实验一：射频场中心频率的确定</a></li>
+      <li><a href="#">实验二：成像实验</a></li>
+      <li><a href="#">实验三：伪影模拟</a></li>
+    </ol>
+    </div>
+    
+   <div data-role="footer" data-position="fixed" id="main_footer">
+    <div data-role="navbar">
+      <ul>
+        <li><a href="#pageone" data-icon="home" data-transition="slide" data-direction="reverse">登录信息</a></li>
+        <li><a href="#p" data-icon="star">实验教学</a></li>
+      </ul>
+    </div>
+  </div>
+
+
+
+</div>
+
+</body>
+</html>
